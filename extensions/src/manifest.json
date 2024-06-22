@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "MelonPlayer",
+  "version": "0.0.1",
+
+  "description": "Mp",
+
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/watch*"],
+      "js": ["./src/jquery-3.7.1.min.js", "./src/main.js"],
+      "css": ["./src/style.css"]
+    }
+  ]
+}

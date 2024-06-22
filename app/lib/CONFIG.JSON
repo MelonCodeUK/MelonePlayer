@@ -1,0 +1,19 @@
+{
+  "command": {
+    "download": {
+      "video": [""],
+      "audio": [
+        "{ytdl} -x --audio-format mp3 --newline --no-warnings --progress-template",
+        "{\"download_info\": \"{\\\"download_done_byte\\\":\\\"%(progress.downloaded_bytes)s\\\",\\\"download_byte\\\":\\\"%(progress.total_bytes)s\\\",\\\"speed\\\":\\\"%(progress.speed)s\\\",\\\"left\\\":\\\"%(progress.eta)s\\\"}\"",
+        "-o",
+        "{path}",
+        "video_url"
+      ],
+      "preview": [
+        "{ytdl} --write-thumbnail --skip-download -o ",
+        "\"/%(title)s.%(ext)s\" ",
+        "{video_url}"
+      ]
+    }
+  }
+}

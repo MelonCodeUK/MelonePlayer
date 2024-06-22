@@ -1,0 +1,3 @@
+{
+  ('download_info: "{"download_done_byte":"%(progress.downloaded_bytes)s","download_byte":"%(progress.total_bytes)s","speed":"%(progress.speed)s","left":"%(progress.eta)s"}');
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jQuery Modal Example</title>
+    <style>
+      /* Стиль для модального окна */
+      .modal {
+        display: none; /* Скрыть модальное окно по умолчанию */
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4); /* Черный цвет с прозрачностью */
+      }
+
+      /* Стиль для модального контента */
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+
+      /* Стиль для кнопки закрытия модального окна */
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Получаем модальное окно
+        var modal = $("#myModal");
+
+        // Получаем кнопку, которая открывает модальное окно
+        var btn = $("#openModal");
+
+        // Получаем элемент <span>, который закрывает модальное окно
+        var span = $(".close");
+
+        // Когда пользователь нажимает на кнопку, открываем модальное окно
+        btn.click(function () {
+          modal.show();
+        });
+
+        // Когда пользователь нажимает на <span> (x), закрываем модальное окно
+        span.click(function () {
+          modal.hide();
+        });
+
+        // Когда пользователь кликает где-то за пределами модального окна, закрываем его
+        $(window).click(function (event) {
+          if (event.target.id == "myModal") {
+            modal.hide();
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <!-- Кнопка для открытия модального окна -->
+    <button id="openModal">Open Modal</button>
+
+    <!-- Модальное окно -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>This is a simple modal window</p>
+      </div>
+    </div>
+  </body>
+</html>

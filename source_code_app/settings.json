@@ -1,0 +1,117 @@
+{
+  "app_info": {
+    "name": "app",
+    "version": 0.1,
+    "settings_version": 0.1,
+    "original_repository": "",
+    "localization": ["ukraine", "german", "russian", "polish"],
+    "links": []
+  },
+  "plugins": [],
+  "app_settings": {
+    "theme": "default",
+    "port": 3487,
+    "url_server": "http://127.0.0.1",
+    "title_app": "MelonPlayer",
+    "width": 430,
+    "height": 200,
+    "special_settings": {},
+    "special_arguments": {},
+    "paths": {
+      "./assets": {
+        "/lib": ["/bin"],
+        "/files": [
+          { "/PlayList": ["/Music", "/Previews", "/Video"] },
+          "/Themes"
+        ]
+      }
+    },
+    "playlist.json": "{play_list_path}/playlist.json",
+    "position": [
+      "left_center",
+      "left_up",
+      "left_down",
+      "right_center",
+      "right_up",
+      "right_down",
+      "center_center",
+      "center_down",
+      "center_up"
+    ]
+  },
+  "themes": [
+    {
+      "name": "default",
+      "app_settings": {
+        "width": 430,
+        "height": 200,
+        "position": [
+          "left_center",
+          "left_up",
+          "left_down",
+          "right_center",
+          "right_up",
+          "right_down",
+          "center_center",
+          "center_down",
+          "center_up"
+        ]
+      },
+      "path_to:config.js": ".",
+      "autor": "",
+      "version": 0.1,
+      "description": "",
+      "repository": [],
+      "links": [],
+      "permissions": ["*", "all"],
+      "path": "./defaultTheme",
+      "dependence": {
+        "javascript_modules": ["jQuery"],
+        "dll_modules": [],
+        "windows_executables_modules": ["ytdl", "ffmpeg"]
+      },
+      "potential_localization": {
+        "Українська": {
+          "path": "default/index_ua.html",
+          "index.html": "index_ua.html",
+          "actives_scripts": [""]
+        }
+      }
+    }
+  ],
+  "lib_settings": {
+    "exe": {
+      "ytdl.exe": {
+        "download_command": {
+            "video": [
+              "{ytdl}",
+              "-o",
+              "{path}",
+              "--newline",
+              "--format",
+              "best",
+              "{video_url}"
+            ],
+            "audio": [
+              "{ytdl}",
+              "-o",
+              "{path}",
+              "--newline",
+              "--audio-format",
+              "mp3",
+              "{video_url}"
+            ]
+          }
+        },
+        "download_preview_command": []
+    }
+  },
+  "errors": {
+    "520": {
+      "type": "critic"
+    },
+    "404": {
+      "type": "normal"
+    }
+  }
+}

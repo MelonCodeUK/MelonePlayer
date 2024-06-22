@@ -1,0 +1,1 @@
+link:{source-dir}/readFromFile.nim[]
