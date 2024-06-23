@@ -90,8 +90,21 @@
     </div>
     <div id="info_window">
       <div id="window">
-        <p>x</p>
-        <p>Додається нова музика...</p>
+        <p style="margin: 0%;">Додається нова музика...</p>
+        <div class="progress-bar" style="
+        	border-radius: 60px;
+	        overflow: hidden;
+          width: 80%;
+">
+          <span class="bar" style="display: block; background: rgba(4, 186, 62, 0.5);">
+            <span class="progress" style="display: block;  background: green;
+            color: #fff;
+            padding: 5px;
+            width: 0%;"></span>
+          </span>
+        </div>
+        <text id="download_info"></text>
+
       </div>
     </div>
     <script src="./js/main.js"></script>

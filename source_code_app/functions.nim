@@ -1,9 +1,27 @@
 import os
-import json
+import json, ws
 import strutils, strformat, json
 from osproc import execCmdEx
 import osproc, streams, strutils, sequtils, asyncdispatch, atomics
 import /melone_player/types
+
+# proc add*[T](arry: ref seq[T], element: T) =
+
+
+# proc add*[T](atomicArray: var Atomic[ref seq[T]], element: T) =
+#   var arrayReddy = atomicArray.load[]
+#   arrayReddy.add(element)
+#   var temp_array = cast[ref seq[T]](addr arrayReddy)
+#   atomicArray.store(temp_array)
+
+
+# proc remove*[T](atomicArray: var Atomic[ref seq[T]], element: T) =
+#   var arrayReddy = atomicArray.load[]
+#   for index, data in arrayReddy:
+#     if data == element:
+#       arrayReddy.delete(index)
+#   var temp_array = cast[ref seq[T]](addr arrayReddy)
+#   atomicArray.store(temp_array)
 
 
 

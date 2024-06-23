@@ -1,5 +1,5 @@
 
-import jester
+import jester, sequtils
 import melonGui/melongui
 import functions
 import strutils, crowngui
@@ -20,8 +20,9 @@ var initialStr = ""
 let initialStrPtr = cast[ptr string](addr initialStr)
 atomic_variable.store(initialStrPtr)
 app.init()
-
 var channel: Channel[seq[string]]
+var clients: Atomic[ptr seq[WebSocket]]
+clients.store(cast[ptr seq[WebSocket]](addr temp_WebSocket))
 channel.open()
 var s = 0
 
@@ -327,16 +328,30 @@ proc startServer() {.thread, nimcall.} =
   runForever()
 
 
-proc webSocketServer(req: asynchttpserver.Request) {.async.} =
+proc webSocketServer(req: asynchttpserver.Request) {.async, gcsafe.} =
+
   if req.url.path == "/ws":
     var ws: WebSocket
     try:
       ws = await newWebSocket(req)
+      var temp_a = clients.load()[]
+      if temp_a[0] == WebSocket():
+        temp_a.delete(0)
+      temp_a.add(ws)
+      clients.store(cast[ptr seq[WebSocket]](addr temp_a))
+      # var a = clients.load
+      # a.add(ws)
+      # clients.store(a)
       echo "Connected..."
       await ws.send("Welcome to simple chat server")
 
+      proc broadcastMessage(msg: string) =
+        {.gcsafe.}:
+          for client in clients.load()[]:
+            if client.readyState == Open:
+              waitFor client.send(msg)
 
-      proc reader() {.async.} =
+      proc reader() {.async, gcsafe.} =
         # Loops while socket is open, looking for messages to read
         while ws.readyState == Open:
           echo "Waiting for message..."
@@ -344,23 +359,24 @@ proc webSocketServer(req: asynchttpserver.Request) {.async.} =
           try:
             var packet = await ws.receiveStrPacket()
             echo packet
+            # Отправляем сообщение всем подключенным клиентам
+            broadcastMessage(packet)
           except CatchableError as e:
             echo "Error receiving packet: ", e.msg
             break
 
-
-      proc writer() {.async.} =
+      proc writer() {.async, gcsafe.} =
         try:
           ## Loops while socket is open, looking for messages to write
           echo "writer"
           while ws.readyState == Open:
-            # {.gcsafe.}:
               var el = atomic_variable.load[]
               if el != "":
-                await ws.send(el)
+                broadcastMessage(el)
                 await sleepAsync(500)
         except CatchableError as e:
           echo "Error in WebSocket connection: ", e.msg 
+
       asyncCheck reader()
       await writer()
     except CatchableError as e:
@@ -368,6 +384,12 @@ proc webSocketServer(req: asynchttpserver.Request) {.async.} =
     finally:
       if ws.readyState != Closed:
         ws.close()
+      var temp_a = clients.load()[]
+      if ws in temp_a:
+        for key, val in temp_a:
+          if ws == val:
+            temp_a.delete(key)
+        clients.store(cast[ptr seq[WebSocket]](addr temp_a))
       echo "Connection closed."
 
 
