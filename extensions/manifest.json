@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "MelonePlayer",
+  "version": "0.0.1",
+  "description": "",
+  "permissions": [
+    "contextMenus",
+    "tabs",
+    "activeTab",
+    "*://www.youtube.com/watch*"
+  ],
+  "background": {
+    "scripts": ["./src/background.js", "./src/jquery-3.7.1.min.js"],
+    "persistent": false
+  },
+  "icons": {
+    "16": "src/icon.webp"
+  }
+}

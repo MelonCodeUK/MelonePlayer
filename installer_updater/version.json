@@ -1,0 +1,6 @@
+{
+  "installer": [{ "version": "0.0.1", "install_Url": "url" }, {}],
+  "MelonePlayer": [
+    { "version": "0.0.1", "type": "Alpha", "install_Url": "url" }
+  ]
+}

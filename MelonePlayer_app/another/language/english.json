@@ -1,0 +1,7 @@
+{
+    "author":"deepl.com",
+    "worlds": {
+        "error": "Error",
+        "file_not_found": "file not found"
+    }
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Bootstrap Tabs Example</title>
+    <link rel="stylesheet" href="css/animate.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/settings_main.js"></script>
+    <script src="./js/highlight.min.js"></script>
+    <script src="./js/ws_server.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/agate.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="tabs-container">
+            <!-- Вкладки слева -->
+            <ul class="nav nav-tabs" id="tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="view_settings_button" data-toggle="tab" href="#view_settings" role="tab" aria-controls="tab1" aria-selected="true">Налаштування вигляду</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="app_settings_button"
+              data-toggle="tab"
+              href="#app_settings"
+              role="tab"
+              aria-controls="tab2"
+              aria-selected="false"
+              >Налаштування програми</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="info_button"
+              data-toggle="tab"
+              href="#info"
+              role="tab"
+              aria-controls="tab3"
+              aria-selected="false"
+              >Інформація та оновлення</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="console_button"
+              data-toggle="tab"
+              href="#console"
+              role="tab"
+              aria-controls="tab3"
+              aria-selected="false"
+              >Консоль</a
+            >
+          </li>
+        </ul>
+
+        <!-- Содержимое справа -->
+        <div class="tab-content" id="TabContent">
+          <div
+            class="tab-pane fade show active"
+            id="view_settings"
+            role="tabpanel"
+            aria-labelledby="tab1-tab"
+          >
+            <div
+              style="
+                display: flex;
+                flex-direction: row; /* Расположить элементы в строку */
+                align-items: flex-start; /* Выравнивание элементов по верхнему краю */
+              "
+            >
+              <div>
+                <h3>Задайте вигляд для плееру:</h3>
+                <label for="thema">Тема:</label>
+                <select name="thema" id="thema"></select>
+                <p></p>
+                <label for="language">Мова:</label>
+                <select name="language" id="language">
+                  <option value="ukrainian">Українська</option>
+                  <option value="russian">Русская</option>
+                  <option value="polan">Polska</option>
+                  <option value="germany">Deutsch</option>
+                </select>
+                <p></p>
+                <label for="width">Ширина: </label>
+                <input type="number" name="width" id="" min="0" value="" />
+                <label for="height">Висота: </label>
+                <input type="number" name="height" id="" min="0" value="" />
+                <label for="chek">chek</label>
+                <input type="checkbox" name="" id="chek" />
+              </div>
+              <div class="theme_info">
+                <p>Ім'я:</p>
+                <p>Автор:</p>
+                <p>Версія:</p>
+                <p>Доступні мови:</p>
+                <p>Опис:</p>
+                <p>Лінки:</p>
+                <p>Repository:</p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="app_settings"
+            role="tabpanel"
+            aria-labelledby="tab2-tab"
+          >
+            <div>
+              <h3>Налаштування програми:</h3>
+              <label for="language">Мова програми:</label>
+              <select name="language" id="language">
+                <option value="ukrainian">Українська</option>
+                <option value="russian">Русская</option>
+                <option value="polan">Polska</option>
+                <option value="germany">Deutsch</option>
+              </select>
+              <p></p>
+
+              <label for="path">Шлях:</label>
+              <input name="path" type="text" disabled />
+              <button name="path">змінити</button>
+              <p></p>
+
+              <label for="path_log">Шлях до .log файлів:</label>
+              <input name="path_log" type="text" disabled />
+              <button name="path_log">змінити</button>
+              <p></p>
+
+              <label for="path_theme">Шлях до theme файлів:</label>
+              <input name="path_theme" type="text" disabled />
+              <button name="path_theme">змінити</button>
+              <p></p>
+
+              <label for="path_settings">Шлях до settings.json файла:</label>
+              <input name="path_settings" type="text" disabled />
+              <button name="path_settings">змінити</button>
+              <p></p>
+
+              <label for="path_music">Шлях до музики:</label>
+              <input name="path_music" type="text" disabled />
+              <button name="path_music">змінити</button>
+              <p></p>
+
+              <label for="path_preview">Шлях до preview файлів:</label>
+              <input name="path_preview" type="text" disabled />
+              <button name="path_preview">змінити</button>
+
+              <p>Налаштування серверу:</p>
+              <label for="port">Порт:</label>
+              <input name="port" type="text" disabled />
+              <button name="port">змінити</button>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="info"
+            role="tabpanel"
+            aria-labelledby="tab3-tab"
+          >
+            <p id="version">version:</p>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="console"
+            role="tabpanel"
+            aria-labelledby="tab1-tab"
+          >
+            <div id="console_menu">
+              <div id="messages"></div>
+              <!-- <pre><code id="messages" class="language-json"></code></pre> -->
+              <input type="text" id="messageInput" />
+              <button id="sendMessage">></button>
+              <button id="sendTESTMSG">test_msg</button>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </body>
+</html>
