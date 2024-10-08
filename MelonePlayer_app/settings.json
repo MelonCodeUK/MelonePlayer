@@ -129,5 +129,12 @@
       "ffmpeg": { "github": "https://github.com/BtbN/FFmpeg-Builds" }
     }
   },
+  "scripts": [
+    {
+      "name": "SetHomePathVariable",
+      "type": "setx",
+      "script": ["MELONEPLAYER_HOME_PATH", "\"{path}\""]
+    }
+  ],
   "start_scripts": []
 }

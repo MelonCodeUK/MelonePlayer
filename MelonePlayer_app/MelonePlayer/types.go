@@ -3,6 +3,7 @@ package MelonePlayer
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -19,6 +20,8 @@ type JsonNode map[string]interface{}
 // settings
 var (
 	Data             *fastjson.Value
+	Scripts          *fastjson.Value
+	StartScript      *fastjson.Value
 	App_Settings     *fastjson.Value
 	App_Info         *fastjson.Value
 	Version          float32
@@ -72,6 +75,7 @@ var SettingsWindows Window
 
 type Paths struct {
 	StaticDir        string
+	HomePath         string
 	SettingsFilePath string
 	Lib              string
 	Bin              string
@@ -84,6 +88,20 @@ var Path Paths
 var now = time.Now()
 var Log = NewLogger(fmt.Sprintf("log_%d.%s.%d.log", now.Year(), now.Month(), now.Day()))
 var settingsNames = []string{"setting.json", ".setting.json", "settings.json", ".settings.json", "настройки.json", ".настройки.json", "настройка.json", ".настройка.json", "налаштування.json", ".налаштування.json"}
+
+func Command(command string, args []string) (string, error) {
+	// Выполнение команды
+	cmd := exec.Command(command, args...)
+	output, err := cmd.Output() // Получаем вывод команды
+
+	if err != nil {
+		Log.Error(err.Error())
+		return "", err
+	} else {
+		Log.Info(string(output))
+		return string(output), nil
+	}
+}
 
 // Функция для рекурсивного обхода файлов и папок и сбора путей в срез
 func CollectDirContents(path string) ([]string, error) {
@@ -150,6 +168,10 @@ func SearchSettingsFiles() string {
 	return ""
 }
 
+func StartStartingsScripts() {
+
+}
+
 // Чтение и парсинг файла JSON
 
 func GetData(keys []string) *fastjson.Value {
@@ -189,6 +211,40 @@ func GetSettings() {
 		Data = GetData([]string{})
 		App_Info = Data.Get("app_info")
 		App_Settings = Data.Get("app_settings")
+		go func() {
+			dir, err := os.Getwd() // Получаем текущую директорию
+			if err != nil {
+				Log.Error(err.Error())
+				return
+			}
+			Path.HomePath = dir
+		}()
+
+		Scripts := Data.GetArray("scripts")
+		for _, item := range Scripts {
+			if string(item.GetStringBytes("name")) == "SetHomePathVariable" {
+				value, err := Command("where", []string{string(item.GetStringBytes("type"))})
+				if err == nil {
+					var a_temp = item.GetArray("script")
+					// Преобразуем []*fastjson.Value в []string
+					var result []string
+					for _, v := range a_temp {
+						if string(v.GetStringBytes()) == "\"{path}\"" {
+							b_temp := strings.ReplaceAll(string(v.GetStringBytes()), "{path}", Path.HomePath)
+							Log.Error(b_temp)
+							result = append(result, b_temp) // Извлекаем строковое значение
+
+						} else {
+							result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
+
+						}
+					}
+					Command(value[:len(value)-2], result)
+				}
+			}
+
+		}
+
 		Path.StaticDir = string(App_Settings.GetStringBytes("static_dir"))
 		Version = float32(App_Info.GetFloat64("version"))
 		Version_Settings = float32(App_Info.GetFloat64("settings_version"))

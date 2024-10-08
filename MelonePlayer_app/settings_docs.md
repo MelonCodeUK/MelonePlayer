@@ -2,3 +2,11 @@
 
 - update_script та update_script_path- зарезервовані слова
 - в списку пишится або лише `path` до скрипта або лише cам `script`.
+- type - тип скрипту(сmd, powershell)
+
+### scripts - тут можна додавати свої скрипти а потім звертатись до них з розширень
+
+- name - ім'я скрипту
+- type - тип скрипту(сmd, powershell)
+- script - скрипт
+- script_path - шлях до скрипта

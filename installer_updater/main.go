@@ -9,6 +9,7 @@ import (
 	"github.com/alexflint/go-arg"
 )
 
+var licenceUrl_ua = "https://raw.githubusercontent.com/MelonCodeUK/MelonePlayer/refs/heads/main/licence/ua.txt"
 var updateUrl = "https://raw.githubusercontent.com/MelonCodeUK/MelonePlayer/refs/heads/main/installer_updater/version.json"
 
 func Українська(skip_license bool) {
@@ -16,7 +17,7 @@ func Українська(skip_license bool) {
 
 	} else {
 		isLicenseAccept := ""
-		fmt.Println(GetData())
+		fmt.Println(GetData(licenceUrl_ua))
 		fmt.Println("Чи приймаете ви згоду?(yes - так\\no - ні)")
 		fmt.Scanln(&isLicenseAccept)
 		if isLicenseAccept == "yes" {
@@ -100,7 +101,7 @@ func main() {
 				os.Exit(1)
 			}
 		} else if args.Licence == "ua" {
-			fmt.Println(license_agreement_ua)
+			fmt.Println(GetData(licenceUrl_ua))
 		} else if args.Licence == "en" {
 		} else if args.Reinstall {
 			Reinstall()
