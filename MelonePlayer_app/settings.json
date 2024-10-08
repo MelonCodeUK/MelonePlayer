@@ -128,5 +128,6 @@
       },
       "ffmpeg": { "github": "https://github.com/BtbN/FFmpeg-Builds" }
     }
-  }
+  },
+  "start_scripts": []
 }
