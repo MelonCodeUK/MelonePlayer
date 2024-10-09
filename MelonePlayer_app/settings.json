@@ -132,9 +132,10 @@
   "scripts": [
     {
       "name": "SetHomePathVariable",
-      "type": "setx",
-      "script": ["MELONEPLAYER_HOME_PATH", "\"{path}\""]
+      "description": "",
+      "type": ["autoStart", "Command"],
+      "executable_file": "setx",
+      "args": ["MELONEPLAYER_HOME_PATH", "\"{path}\""]
     }
-  ],
-  "start_scripts": []
+  ]
 }

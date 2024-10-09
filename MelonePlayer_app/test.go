@@ -175,58 +175,26 @@
 
 // // 	EnumWindows(callback, 0)
 // // }
+
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os/exec"
+	"os"
 )
 
+func isValidPath(path string) bool {
+	// Используем os.Stat для получения информации о файле или директории
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err) // Если ошибка не "файл не существует", путь валиден
+}
+
 func main() {
-	// Команда и её аргументы
-	cmd := exec.Command()
+	path := "C:/Windows/System32/setx.exe" // Укажи свой путь здесь
 
-	// Создание пайпов для чтения Stdout и Stderr
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Printf("Ошибка получения StdoutPipe: %v\n", err)
-		return
+	if isValidPath(path) {
+		fmt.Println("Путь валиден.")
+	} else {
+		fmt.Println("Путь не валиден.")
 	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		fmt.Printf("Ошибка получения StderrPipe: %v\n", err)
-		return
-	}
-
-	// Запуск команды
-	if err := cmd.Start(); err != nil {
-		fmt.Printf("Ошибка запуска команды: %v\n", err)
-		return
-	}
-
-	// Горутина для чтения вывода из Stdout в реальном времени
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			fmt.Printf("Stdout: %s\n", scanner.Text())
-		}
-	}()
-
-	// Горутина для чтения вывода из Stderr в реальном времени
-	go func() {
-		scanner := bufio.NewScanner(stderr)
-		for scanner.Scan() {
-			fmt.Printf("Stderr: %s\n", scanner.Text())
-		}
-	}()
-
-	// Ожидание завершения процесса
-	if err := cmd.Wait(); err != nil {
-		fmt.Printf("Команда завершилась с ошибкой: %v\n", err)
-		return
-	}
-
-	fmt.Println("Команда выполнена успешно")
 }

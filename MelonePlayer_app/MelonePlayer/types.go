@@ -1,6 +1,7 @@
 package MelonePlayer
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -20,8 +21,8 @@ type JsonNode map[string]interface{}
 // settings
 var (
 	Data             *fastjson.Value
-	Scripts          *fastjson.Value
-	StartScript      *fastjson.Value
+	Scripts_         []*fastjson.Value
+	AutoStartScripts []*fastjson.Value
 	App_Settings     *fastjson.Value
 	App_Info         *fastjson.Value
 	Version          float32
@@ -37,6 +38,7 @@ var (
 	// IsSettingsWindowVisible bool = false
 )
 var Message = make(chan string)
+var ElementsForCustomScripts = []string{"name", "description", "type", "executable_file", "args", "script_path"}
 
 type Window struct {
 	Title            string
@@ -88,6 +90,53 @@ var Path Paths
 var now = time.Now()
 var Log = NewLogger(fmt.Sprintf("log_%d.%s.%d.log", now.Year(), now.Month(), now.Day()))
 var settingsNames = []string{"setting.json", ".setting.json", "settings.json", ".settings.json", "настройки.json", ".настройки.json", "настройка.json", ".настройка.json", "налаштування.json", ".налаштування.json"}
+
+func Command_p(path string, args []string) {
+	// Команда и её аргументы
+	cmd := exec.Command(path, args...)
+
+	// Создание пайпов для чтения Stdout и Stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		Log.Error("Ошибка получения StdoutPipe: %v\n", err)
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		Log.Error("Ошибка получения StderrPipe: %v\n", err)
+		return
+	}
+
+	// Запуск команды
+	if err := cmd.Start(); err != nil {
+		Log.Error("Ошибка запуска команды: %v\n", err)
+		return
+	}
+
+	// Горутина для чтения вывода из Stdout в реальном времени
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			Log.Info(path + ": " + scanner.Text())
+		}
+	}()
+
+	// Горутина для чтения вывода из Stderr в реальном времени
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			Log.Error(path + ":" + scanner.Text())
+		}
+	}()
+
+	// Ожидание завершения процесса
+	if err := cmd.Wait(); err != nil {
+		Log.Error("Команда завершилась с ошибкой: %v\n", err)
+		return
+	}
+
+}
 
 func Command(command string, args []string) (string, error) {
 	// Выполнение команды
@@ -168,8 +217,78 @@ func SearchSettingsFiles() string {
 	return ""
 }
 
-func StartStartingsScripts() {
+func isValidPath(path string) bool {
+	// Используем os.Stat для получения информации о файле или директории
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err) // Если ошибка не "файл не существует", путь валиден
+}
 
+func InitScripts() {
+	for _, i := range Scripts_ {
+		if i.Get("name") != nil && i.Get("type") != nil && i.Get("executable_file") != nil {
+			found := false
+			for _, item := range i.Get("type").GetArray() {
+				if string(item.GetStringBytes()) == "autoStart" {
+					found = true
+				}
+			}
+			if found {
+				AutoStartScripts = append(AutoStartScripts, i)
+			}
+		}
+
+	}
+	for _, i := range AutoStartScripts {
+		if i.Get("Command") != nil && i.GetArray("args") != nil {
+			// Преобразуем []*fastjson.Value в []string
+			var result []string
+			for _, v := range i.GetArray("args") {
+				result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
+			}
+			go func() {
+
+				if !isValidPath(string(i.GetStringBytes("executable_file"))) {
+					value, err := Command("C:\\Windows\\System32\\where.exe", []string{string(i.GetStringBytes("executable_file"))})
+					if err == nil {
+
+						results, err := Command(value, result)
+						Log.Info(results)
+						Log.Warn(err)
+
+					}
+				} else {
+					result, err := Command(string(i.GetStringBytes("executable_file")), result)
+					if err == nil {
+						Log.Info(result)
+
+					} else {
+						Log.Warn(err)
+					}
+				}
+
+			}()
+		} else if i.Get("Command_p") != nil && i.GetArray("args") != nil {
+			// Преобразуем []*fastjson.Value в []string
+			var result []string
+			for _, v := range i.GetArray("args") {
+				result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
+			}
+			go func() {
+
+				if !isValidPath(string(i.GetStringBytes("executable_file"))) {
+					value, err := Command("C:\\Windows\\System32\\where.exe", []string{string(i.GetStringBytes("executable_file"))})
+					if err == nil {
+
+						Command_p(value, result)
+					}
+				} else {
+					Command_p(string(i.GetStringBytes("executable_file")), result)
+				}
+
+			}()
+		}
+
+	}
 }
 
 // Чтение и парсинг файла JSON
@@ -220,30 +339,30 @@ func GetSettings() {
 			Path.HomePath = dir
 		}()
 
-		Scripts := Data.GetArray("scripts")
-		for _, item := range Scripts {
-			if string(item.GetStringBytes("name")) == "SetHomePathVariable" {
-				value, err := Command("where", []string{string(item.GetStringBytes("type"))})
-				if err == nil {
-					var a_temp = item.GetArray("script")
-					// Преобразуем []*fastjson.Value в []string
-					var result []string
-					for _, v := range a_temp {
-						if string(v.GetStringBytes()) == "\"{path}\"" {
-							b_temp := strings.ReplaceAll(string(v.GetStringBytes()), "{path}", Path.HomePath)
-							Log.Error(b_temp)
-							result = append(result, b_temp) // Извлекаем строковое значение
+		Scripts_ = Data.GetArray("scripts")
+		// for _, item := range Scripts {
+		// 	if string(item.GetStringBytes("name")) == "SetHomePathVariable" {
+		// 		value, err := Command("where", []string{string(item.GetStringBytes("type"))})
+		// 		if err == nil {
+		// 			var a_temp = item.GetArray("script")
+		// 			// Преобразуем []*fastjson.Value в []string
+		// 			var result []string
+		// 			for _, v := range a_temp {
+		// 				if string(v.GetStringBytes()) == "\"{path}\"" {
+		// 					b_temp := strings.ReplaceAll(string(v.GetStringBytes()), "{path}", Path.HomePath)
+		// 					Log.Error(b_temp)
+		// 					result = append(result, b_temp) // Извлекаем строковое значение
 
-						} else {
-							result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
+		// 				} else {
+		// 					result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
 
-						}
-					}
-					Command(value[:len(value)-2], result)
-				}
-			}
+		// 				}
+		// 			}
+		// 			Command(value[:len(value)-2], result)
+		// 		}
+		// 	}
 
-		}
+		// }
 
 		Path.StaticDir = string(App_Settings.GetStringBytes("static_dir"))
 		Version = float32(App_Info.GetFloat64("version"))
