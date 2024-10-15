@@ -23,6 +23,12 @@ func NewLogger(log_file_path string) Logger {
 	logger := log15.New()
 
 	logger.SetHandler(log15.StdoutHandler)
+	if _, err := os.Stat("./losg"); os.IsNotExist(err) {
+		// Папка не существует, создаем её
+		err := os.MkdirAll("./logs", 0755)
+		if err != nil {
+		}
+	}
 	file, err := os.OpenFile(log_file_path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		logger.Crit("error opening log file: %v", err)

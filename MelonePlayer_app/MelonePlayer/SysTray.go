@@ -9,7 +9,7 @@ import (
 )
 
 func Init() {
-	iconData, err := os.ReadFile(Path.StaticDir + "/icons/iconMelonPlayer.ico")
+	iconData, err := os.ReadFile(Path.Icons + "/" + string(App_Settings.GetStringBytes("default_icon")))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,0 +1,143 @@
+{
+  "app_info": {
+    "name": "MelonePlayer",
+    "version": 0.1,
+    "subversion": "0.0.1",
+    "version_type": "Alpha",
+    "settings_version": 0.1,
+    "original_repository": "",
+    "localization": ["ukraine", "german", "russian", "polish", "english"],
+    "links": []
+  },
+  "plugins": [],
+  "app_settings": {
+    "default_language": "ukraine",
+    "resetting": false,
+    "save_log": true,
+    "debug": true,
+    "static_dir": "another",
+    "theme": "default",
+    "auto_update": true,
+    "port": 2308,
+    "url_server": "http://127.0.0.1",
+    "title_app": "MelonPlayer",
+    "x": 935,
+    "y": 567,
+    "width": 430,
+    "height": 200,
+    "advanced_settings": {},
+    "paths": {
+      "{static_dir}": {
+        "/lib": ["/bin"],
+        "/PlayLists": [
+          { "/DefaultPlayList": ["/Music", "/Preview", "/Video"] },
+          "/Themes"
+        ]
+      }
+    },
+    "playlist.json": "{play_list_path}/playlist.json",
+    "position": [
+      "left_center",
+      "left_up",
+      "left_down",
+      "right_center",
+      "right_up",
+      "right_down",
+      "center_center",
+      "center_down",
+      "center_up"
+    ]
+  },
+  "themes": [
+    {
+      "name": "default",
+      "app_settings": {
+        "width": 430,
+        "height": 200,
+        "position": [
+          "left_center",
+          "left_up",
+          "left_down",
+          "right_center",
+          "right_up",
+          "right_down",
+          "center_center",
+          "center_down",
+          "center_up"
+        ]
+      },
+      "path_to:config.js": ".",
+      "author": "",
+      "version": 0.1,
+      "description": "",
+      "repository": [],
+      "links": [],
+      "permissions": ["*", "all"],
+      "path": "./defaultTheme",
+      "dependence": {
+        "javascript_modules": ["jQuery"],
+        "dll_modules": [],
+        "windows_executables_modules": ["ytdl", "ffmpeg"]
+      },
+      "potential_localization": {
+        "Українська": {
+          "path": "default/index_ua.html",
+          "index.html": "index_ua.html",
+          "actives_scripts": [""]
+        }
+      }
+    }
+  ],
+  "lib_settings": {
+    "binaries": {
+      "ytdl": {
+        "support_links": ["youtube.com", "youtu.be"],
+        "download_commands": {
+          "video": [
+            "ytdl.exe",
+            "-o",
+            "{path}/%(title)s.%(ext)s",
+            "--newline",
+            "--format",
+            "best",
+            "{url}"
+          ],
+          "music": [
+            "ytdl.exe",
+            "-o",
+            "{path}/%(title)s.%(ext)s",
+            "--newline",
+            "--format",
+            "bestaudio",
+            "{url}"
+          ],
+          "preview": [
+            "ytdl.exe",
+            "-o",
+            "{path}/%(title)s.%(ext)s",
+            "--write-thumbnail",
+            "--skip-download",
+            "--newline",
+            "{url}"
+          ]
+        },
+        "download_url": "https://github.com/yt-dlp/yt-dlp/releases/download/2024.10.07/yt-dlp_min.exe",
+        "github": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "spotifyDL": {
+        "github": "https://github.com/spotDL/spotify-downloader",
+        "download_commands": { "audio": [], "preview": [] }
+      },
+      "ffmpeg": { "github": "https://github.com/BtbN/FFmpeg-Builds" }
+    }
+  },
+  "scripts": [
+    {
+      "name": "SetHomePathVariable",
+      "description": "",
+      "type": ["autoStart", "Command"],
+      "executable_file": "setx",
+      "args": ["MELONEPLAYER_HOME_PATH", "\"{path}\""]
+    }
+  ]
+}

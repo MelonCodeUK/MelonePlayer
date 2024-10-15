@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	// go GetComponents()
 	GetSettings()
 	PrintInfo()
 	go Server()

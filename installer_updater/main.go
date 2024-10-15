@@ -21,7 +21,7 @@ func Українська(skip_license bool) {
 		fmt.Println("Чи приймаете ви згоду?(yes - так\\no - ні)")
 		fmt.Scanln(&isLicenseAccept)
 		if isLicenseAccept == "yes" {
-
+			
 		} else {
 
 			os.Exit(1)

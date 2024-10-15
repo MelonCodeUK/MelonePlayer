@@ -13,6 +13,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/gonutz/w32/v2"
+	"github.com/pelletier/go-toml"
 	"github.com/valyala/fastjson"
 )
 
@@ -35,6 +36,9 @@ var (
 	IsSave_Log       bool = true
 	IsDebug          bool
 	Resetting        bool
+	Translation      *toml.Tree
+	TranslationInfo  *toml.Tree
+
 	// IsSettingsWindowVisible bool = false
 )
 var Message = make(chan string)
@@ -84,11 +88,13 @@ type Paths struct {
 	PlayLists        string
 	DefaultPlayList  string
 	Themes           string
+	Icons            string
+	Language         []string
 }
 
 var Path Paths
 var now = time.Now()
-var Log = NewLogger(fmt.Sprintf("log_%d.%s.%d.log", now.Year(), now.Month(), now.Day()))
+var Log = NewLogger(fmt.Sprintf("logs/log_%d.%s.%d.log", now.Year(), now.Month(), now.Day()))
 var settingsNames = []string{"setting.json", ".setting.json", "settings.json", ".settings.json", "настройки.json", ".настройки.json", "настройка.json", ".настройка.json", "налаштування.json", ".налаштування.json"}
 
 func Command_p(path string, args []string) {
@@ -203,7 +209,7 @@ func RemoveDuplicate(s string, w string) string {
 
 // функиця для поиска файла с настройками
 func SearchSettingsFiles() string {
-	Log.Info("search for a configuration file....")
+	Log.Info("search for a configuration file....") //////
 	paths, _ := CollectDirContents(".")
 	for _, path := range paths {
 		for _, settingsPath := range settingsNames {
@@ -212,7 +218,7 @@ func SearchSettingsFiles() string {
 				return path
 			}
 		}
-		Log.Info(path, fmt.Sprintf("%*s%s", 10, "", color.RedString("NO")))
+		Log.Warn(path, fmt.Sprintf("%*s%s", 10, "", color.RedString("NO")))
 	}
 	return ""
 }
@@ -286,14 +292,104 @@ func InitScripts() {
 				}
 
 			}()
-		}
+		} else if i.Get("Command") != nil && i.GetStringBytes("script_path") != nil {
+			go func() {
 
+				if !isValidPath(string(i.GetStringBytes("executable_file"))) {
+					value, err := Command("C:\\Windows\\System32\\where.exe", []string{string(i.GetStringBytes("executable_file"))})
+					if err == nil {
+
+						results, err := Command(value, []string{string(i.GetStringBytes("script_path"))})
+						Log.Info(results)
+						Log.Warn(err)
+
+					}
+				} else {
+					result, err := Command(string(i.GetStringBytes("executable_file")), []string{string(i.GetStringBytes("script_path"))})
+					if err == nil {
+						Log.Info(result)
+
+					} else {
+						Log.Warn(err)
+					}
+				}
+
+			}()
+
+		} else if i.Get("Command_p") != nil && i.GetStringBytes("script_path") != nil {
+
+			go func() {
+
+				if !isValidPath(string(i.GetStringBytes("executable_file"))) {
+					value, err := Command("C:\\Windows\\System32\\where.exe", []string{string(i.GetStringBytes("executable_file"))})
+					if err == nil {
+
+						Command_p(value, []string{string(i.GetStringBytes("script_path"))})
+					}
+				} else {
+					Command_p(string(i.GetStringBytes("executable_file")), []string{string(i.GetStringBytes("script_path"))})
+				}
+
+			}()
+		}
 	}
 }
 
-// Чтение и парсинг файла JSON
+func mergeTrees(existingTree *toml.Tree, newTree *toml.Tree) {
+	for _, key := range newTree.Keys() {
+		newValue := newTree.Get(key)
+
+		// Если в существующем дереве есть такая же секция (поддерево)
+		if existingValue := existingTree.Get(key); existingValue != nil {
+			// Проверяем, является ли значение поддеревом (секцией)
+			if existingSubTree, ok := existingValue.(*toml.Tree); ok {
+				// Если это секция, рекурсивно сливаем поддеревья
+				if newSubTree, ok := newValue.(*toml.Tree); ok {
+					mergeTrees(existingSubTree, newSubTree)
+				} else {
+					existingTree.Set(key, newValue) // Обновляем, если это не секция
+				}
+			} else {
+				// Если это не секция, просто заменяем значение
+				existingTree.Set(key, newValue)
+			}
+		} else {
+			// Если секция или ключа нет, просто добавляем
+			existingTree.Set(key, newValue)
+		}
+	}
+}
+
+func InitTranslating() {
+	// Создаем пустое дерево TOML
+	tree, err := toml.TreeFromMap(map[string]interface{}{})
+	if err != nil {
+		Log.Fatal("Failed to create empty TOML tree: %v", err)
+		return
+	}
+
+	// Проходим по списку файлов, указанных в Path.Language
+	for _, filePath := range Path.Language {
+		// Пытаемся загрузить каждый файл
+		Log.Warn(filePath)
+		tree1, err := toml.LoadFile(filePath)
+		if err != nil {
+			Log.Error("Error loading TOML file: %v", err)
+			continue // Продолжаем цикл, если файл не загрузился
+		}
+
+		// Если файл успешно загружен, сливаем деревья
+		mergeTrees(tree, tree1)
+	}
+	Translation = tree
+	// Теперь дерево `tree` содержит объединенные данные из всех файлов
+	Log.Info(tree.String())
+
+}
 
 func GetData(keys []string) *fastjson.Value {
+	// Чтение и парсинг файла JSON
+
 	Path.SettingsFilePath = SearchSettingsFiles()
 	if Path.SettingsFilePath != "" {
 		fileData, err := os.ReadFile(Path.SettingsFilePath)
@@ -330,40 +426,8 @@ func GetSettings() {
 		Data = GetData([]string{})
 		App_Info = Data.Get("app_info")
 		App_Settings = Data.Get("app_settings")
-		go func() {
-			dir, err := os.Getwd() // Получаем текущую директорию
-			if err != nil {
-				Log.Error(err.Error())
-				return
-			}
-			Path.HomePath = dir
-		}()
 
 		Scripts_ = Data.GetArray("scripts")
-		// for _, item := range Scripts {
-		// 	if string(item.GetStringBytes("name")) == "SetHomePathVariable" {
-		// 		value, err := Command("where", []string{string(item.GetStringBytes("type"))})
-		// 		if err == nil {
-		// 			var a_temp = item.GetArray("script")
-		// 			// Преобразуем []*fastjson.Value в []string
-		// 			var result []string
-		// 			for _, v := range a_temp {
-		// 				if string(v.GetStringBytes()) == "\"{path}\"" {
-		// 					b_temp := strings.ReplaceAll(string(v.GetStringBytes()), "{path}", Path.HomePath)
-		// 					Log.Error(b_temp)
-		// 					result = append(result, b_temp) // Извлекаем строковое значение
-
-		// 				} else {
-		// 					result = append(result, string(v.GetStringBytes())) // Извлекаем строковое значение
-
-		// 				}
-		// 			}
-		// 			Command(value[:len(value)-2], result)
-		// 		}
-		// 	}
-
-		// }
-
 		Path.StaticDir = string(App_Settings.GetStringBytes("static_dir"))
 		Version = float32(App_Info.GetFloat64("version"))
 		Version_Settings = float32(App_Info.GetFloat64("settings_version"))
@@ -383,11 +447,25 @@ func GetSettings() {
 			Languages = append(Languages, language.String())
 
 		}
+
 		Language_Default = string(App_Settings.GetStringBytes("default_language"))
 		checkingСomponents := CheckingСomponents()
 		if checkingСomponents != nil {
 			os.Exit(1)
 		}
+		dir, err := os.Getwd() // Получаем текущую директорию
+		if err != nil {
+			Log.Error(err.Error())
+			return
+		}
+		Path.HomePath = dir
+		Path.Language = append(Path.Language, Path.HomePath+"\\"+Path.StaticDir+"\\language\\language.toml")
+		if isValidPath(Path.HomePath + "\\" + Path.Themes + "\\" + string(App_Settings.GetStringBytes("theme")) + "\\language.toml") {
+			Path.Language = append(Path.Language, Path.HomePath+"\\"+Path.Themes+"\\"+string(App_Settings.GetStringBytes("theme"))+"\\language.toml")
+		}
+		InitTranslating()
+
+		InitScripts()
 		// resetting()
 	}
 }
@@ -405,7 +483,7 @@ func Remove(slice []string, s int) []string {
 
 func CheckingСomponents() error {
 	// paths
-	paths_files := []string{}
+	paths_files := []string{"./logs"}
 	TraverseDirectories(App_Settings.Get("paths").Get("{static_dir}"), "{static_dir}", &paths_files)
 	// Проходим по каждому элементу списка и заменяем слово
 	for i, str := range paths_files {
@@ -422,7 +500,7 @@ func CheckingСomponents() error {
 			}
 			Log.Debug(fmt.Sprintf("Folder creation check: " + path + "\n\tCREATED!"))
 		} else {
-			Log.Info(fmt.Sprintf("Folder creation check: " + path + "\n\tEXISTS!"))
+			Log.Info(fmt.Sprintf("Folder creation check: " + path + "\n\tEXISTS!")) //////
 		}
 
 		if strings.HasSuffix(path, "lib") {
@@ -431,6 +509,8 @@ func CheckingСomponents() error {
 			Path.PlayLists = path
 		} else if strings.HasSuffix(path, "Themes") {
 			Path.Themes = path
+		} else if strings.HasSuffix(path, "icons") {
+			Path.Icons = path
 		} else if strings.HasSuffix(path, "DefaultPlayList") {
 			Path.DefaultPlayList = path
 		} else if strings.HasSuffix(path, "bin") {
@@ -507,6 +587,13 @@ func PrintInfo() {
 		color.CyanString("Languages supported: %s", color.New(color.BgGreen).Sprint(temp_string)) + "\n",
 	))
 	Log.Write(color.BlueString("Default language: %s", color.HiGreenString(Language_Default)) + "\n")
+	Log.Write(color.CyanString("Home directory: ") + Path.HomePath + "\n")
+	Log.Write(color.CyanString("Lib directory: ") + Static_Dirr + "\\" + Path.Lib + "\n")
+	Log.Write(color.CyanString("Bin directory: ") + Static_Dirr + "\\" + Path.Bin + "\n")
+	Log.Write(color.CyanString("Play Lists directory: ") + Static_Dirr + "\\" + Path.PlayLists + "\n")
+	Log.Write(color.CyanString("Default Play List directory: ") + Static_Dirr + "\\" + Path.DefaultPlayList + "\n")
+	Log.Write(color.CyanString("Themes directory: ") + Static_Dirr + "\\" + Path.Themes + "\n")
+	Log.Write(color.CyanString("Icons directory: ") + Static_Dirr + "\\" + Path.Icons + "\n")
 
 }
 

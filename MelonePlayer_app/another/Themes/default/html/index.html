@@ -1,0 +1,113 @@
+<!-- 
+Заметки:
+1. Музыка не грузится когда в название есть знак "+", в место него слово будет and
+
+
+
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="refresh" content="1" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>MelonPlayer</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/animate.min.css" />
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/ws_server.js"></script>
+  </head>
+
+  <body>
+    <div id="Menu_Buttons">
+      <img
+        class="btn-menu"
+        id="Menu_Button_Close"
+        src="./icons/svg/exit.svg"
+        alt="{{closed}}"
+      />
+      <img
+        class="btn-menu"
+        id="Menu_Buttons_PlayList"
+        src="./icons/svg/play-list.svg"
+        alt="Play List"
+      />
+      <img
+        class="btn-menu"
+        id="Menu_Buttons_Settings"
+        src="./icons/svg/settings.svg"
+        alt="{{settings}}"
+      />
+    </div>
+    <div id="Player">
+      <audio id="music" preload="auto"></audio>
+      <div id="title"></div>
+      <div id="Preview" style="overflow: hidden">
+        <img
+          style="
+            clip-path: inset(40px 0px);
+            object-fit: cove;
+            margin-top: -40px;
+            margin-bottom: -80px;
+          "
+          class="PreviewImg"
+        />
+        <div id="ControlElements">
+          <div id="ProgressBar">
+            <div id="TwoProgressBar"></div>
+          </div>
+          <div id="ControlButton">
+            <img
+              class="play_pause"
+              style="cursor: pointer"
+              id="play"
+              src="./icons/svg/play.svg"
+              alt="./icons/svg/play.svg"
+            />
+            <img
+              id="previous"
+              src="./icons/svg/next.svg"
+              style="transform: rotate(180deg)"
+            />
+            <img id="next" src="./icons/svg/next.svg" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="info_window">
+      <div id="window">
+        <p style="margin: 0%">{{adding_music}}</p>
+        <div
+          class="progress-bar"
+          style="border-radius: 60px; overflow: hidden; width: 80%"
+        >
+          <span
+            class="bar"
+            style="display: block; background: rgba(4, 186, 62, 0.5)"
+          >
+            <span
+              class="progress"
+              style="
+                display: block;
+                background: green;
+                color: #fff;
+                padding: 5px;
+                width: 0%;
+              "
+            ></span>
+          </span>
+        </div>
+        <text id="download_info"></text>
+      </div>
+    </div>
+  </body>
+</html>

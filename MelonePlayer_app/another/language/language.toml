@@ -1,0 +1,74 @@
+
+
+[ukraine.translate_info]
+author = "MeloneCodeUK"
+links = ["", ""]
+translete = 100
+
+
+[ukraine]
+ukraine = "Українська"
+hello = "Привіт"
+adding_music = "Додається нова музика..."
+view_settings = "Налаштування вигляду"
+app_settings = "Налаштування програми"
+information_and_updates = "Інформація та оновлення"
+console = "Консоль"
+view_for_player = "Задайте вигляд для плееру"
+theme = "Тема"
+language = "Мова"
+width = "Ширина"
+height = "Висота"
+name = "Ім'я"
+author = "Автор"
+version = "Версія"
+available_languages = "Доступні мови"
+description = "Опис"
+links = "Лінки"
+closed = "Закрити"
+settings = "налаштування"
+the_program_language = "Мова програми"
+path = "Шлях"
+change = "змінити"
+path_to_theme_files = "Шлях до theme файлів"
+path_to_music = "Шлях до музики"
+server_configuration = "Налаштування серверу"
+port = "Порт"
+test_msg = "Тест повідомлення"
+
+
+[english.translate_info]
+author = "MeloneCodeUK"
+links = ["", ""]
+translete = 100
+
+
+[english]
+english = "English"
+hello = "Hello"
+adding_music = "New music is being added..."
+view_settings = "View settings"
+app_settings = "App settings"
+information_and_updates = "Information and updates"
+console = "Console"
+view_for_player = "Set the view for the player"
+theme = "Theme"
+language = "Language"
+width = "Width"
+height = "Height"
+name = "Name"
+author = "Author"
+version = "Version"
+available_languages = "Available languages"
+description = "Description"
+links = "Links"
+closed = "Close"
+settings = "settings"
+the_program_language = "Program language"
+path = "Path"
+change = "change"
+path_to_theme_files = "Path to theme files"
+path_to_music = "Path to music"
+server_configuration = "Server configuration"
+port = "Port"
+test_msg = "Test message"

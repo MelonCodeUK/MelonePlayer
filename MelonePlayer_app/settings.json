@@ -2,15 +2,17 @@
   "app_info": {
     "name": "MelonePlayer",
     "version": 0.1,
+    "subversion": "0.0.1",
     "version_type": "Alpha",
     "settings_version": 0.1,
     "original_repository": "",
-    "localization": ["ukraine", "german", "russian", "polish", "english"],
+    "localization": ["ukraine", "english"],
     "links": []
   },
   "plugins": [],
   "app_settings": {
-    "default_language": "ukraine",
+    "default_language": "english",
+    "default_icon": "iconMelonPlayer.ico",
     "resetting": false,
     "save_log": true,
     "debug": true,
@@ -29,10 +31,9 @@
       "{static_dir}": {
         "/lib": ["/bin"],
         "/PlayLists": [
-          { "/DefaultPlayList": ["/Music", "/Preview", "/Video"] },
-          "/Themes"
+          { "/DefaultPlayList": ["/Music", "/Preview", "/Video"] }
         ],
-        "/log": ""
+        "/Themes": { "/default": ["/html", "/css", "/js", "/icons"] }
       }
     },
     "playlist.json": "{play_list_path}/playlist.json",
@@ -120,7 +121,9 @@
             "--newline",
             "{url}"
           ]
-        }
+        },
+        "download_url": "https://github.com/yt-dlp/yt-dlp/releases/download/2024.10.07/yt-dlp_min.exe",
+        "github": "https://github.com/yt-dlp/yt-dlp"
       },
       "spotifyDL": {
         "github": "https://github.com/spotDL/spotify-downloader",

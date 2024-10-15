@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="css/animate.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/settings_main.js"></script>
+    <script src="./js/highlight.min.js"></script>
+    <script src="./js/ws_server.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/agate.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="tabs-container">
+        <!-- Вкладки слева -->
+        <ul class="nav nav-tabs" id="tabs" role="tablist">
+          <li class="nav-item">
+            <a
+              class="nav-link active"
+              id="view_settings_button"
+              data-toggle="tab"
+              href="#view_settings"
+              role="tab"
+              aria-controls="tab1"
+              aria-selected="true"
+              >{{view_settings}}</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="app_settings_button"
+              data-toggle="tab"
+              href="#app_settings"
+              role="tab"
+              aria-controls="tab2"
+              aria-selected="false"
+              >{{app_settings}}</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="info_button"
+              data-toggle="tab"
+              href="#info"
+              role="tab"
+              aria-controls="tab3"
+              aria-selected="false"
+              >{{information_and_updates}}</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="console_button"
+              data-toggle="tab"
+              href="#console"
+              role="tab"
+              aria-controls="tab3"
+              aria-selected="false"
+              >{{console}}</a
+            >
+          </li>
+        </ul>
+
+        <!-- Содержимое справа -->
+        <div class="tab-content" id="TabContent">
+          <div
+            class="tab-pane fade show active"
+            id="view_settings"
+            role="tabpanel"
+            aria-labelledby="tab1-tab"
+          >
+            <div
+              style="
+                display: flex;
+                flex-direction: row; /* Расположить элементы в строку */
+                align-items: flex-start; /* Выравнивание элементов по верхнему краю */
+              "
+            >
+              <div>
+                <h3>{{view_for_player}}:</h3>
+                <label for="thema">{{theme}}:</label>
+                <select name="thema" id="thema"></select>
+                <p></p>
+                <label for="language">{{language}}:</label>
+                <select name="language" id="language">
+                  <option value="ukrainian">Українська</option>
+                </select>
+                <p></p>
+                <label for="width">{{width}}: </label>
+                <input type="number" name="width" id="" min="0" value="" />
+                <label for="height">{{height}}: </label>
+                <input type="number" name="height" id="" min="0" value="" />
+                <label for="chek">chek</label>
+                <input type="checkbox" name="" id="chek" />
+              </div>
+              <div class="theme_info">
+                <p>{{name}}:</p>
+                <p>{{author}}:</p>
+                <p>{{version}}:</p>
+                <p>{{available_languages}}:</p>
+                <p>{{description}}:</p>
+                <p>{{links}}:</p>
+                <p>Repository:</p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="app_settings"
+            role="tabpanel"
+            aria-labelledby="tab2-tab"
+          >
+            <div>
+              <h3>{{app_settings}}:</h3>
+              <label for="language">{{the_program_language}}:</label>
+              <select name="language" id="language">
+                <option value="ukrainian">{{ukraine}}</option>
+              </select>
+              <p></p>
+
+              <label for="path">{{path}}:</label>
+              <input name="path" type="text" disabled />
+              <button name="path">{{change}}</button>
+              <p></p>
+
+              <label for="path_theme">{{path_to_theme_files}}:</label>
+              <input name="path_theme" type="text" disabled />
+              <p></p>
+
+              <label for="path_music">{{path_to_music}}:</label>
+              <input name="path_music" type="text" disabled />
+              <button name="path_music">{{change}}</button>
+              <p></p>
+
+              <p>{{server_configuration}}:</p>
+              <label for="port">{{port}}:</label>
+              <input name="port" type="text" disabled />
+              <button name="port">{{change}}</button>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="info"
+            role="tabpanel"
+            aria-labelledby="tab3-tab"
+          >
+            <p id="version">{{version}}:</p>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="console"
+            role="tabpanel"
+            aria-labelledby="tab1-tab"
+          >
+            <div id="console_menu">
+              <div id="messages"></div>
+              <!-- <pre><code id="messages" class="language-json"></code></pre> -->
+              <input type="text" id="messageInput" />
+              <button id="sendMessage">></button>
+              <button id="sendTESTMSG">{{test_msg}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </body>
+</html>

@@ -1,6 +1,7 @@
 package MelonePlayer
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -75,46 +76,117 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool)
 var mutex = sync.Mutex{}
 
+func fileServerHandler(w http.ResponseWriter, r *http.Request) {
+	// Определяем директорию в зависимости от пути запроса
+	var dir string
+	if strings.HasPrefix(r.URL.Path, "/static1/") {
+		dir = "./static1"
+		http.StripPrefix("/static1/", http.FileServer(http.Dir(dir))).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/static2/") {
+		dir = "./static2"
+		http.StripPrefix("/static2/", http.FileServer(http.Dir(dir))).ServeHTTP(w, r)
+	} else {
+		http.NotFound(w, r)
+	}
+}
+
+func substitute(htmlFilePath string) (string, error) {
+	// Чтение HTML-файла
+	htmlContent, err := os.Open(htmlFilePath)
+	if err != nil {
+		return "", err
+	}
+	defer htmlContent.Close() // Закрываем файл после завершения работы
+	// Создаем срез для хранения строк
+	var lines []string
+
+	// Создаем сканер для чтения файла
+	scanner := bufio.NewScanner(htmlContent)
+
+	// Чтение файла построчно
+	for scanner.Scan() {
+		line := scanner.Text()      // Получаем строку
+		lines = append(lines, line) // Добавляем строку в срез
+	}
+
+	// Проверка на ошибки
+	if err := scanner.Err(); err != nil {
+		Log.Error("Error reading file: %v\n", err)
+		return "", err
+	}
+
+	for index, item := range lines {
+		if strings.Contains(item, "{{") && strings.Contains(item, "}}") {
+			Log.Info(item)
+			start := strings.Index(item, "{{")
+			end := strings.Index(item, "}}")
+			if Translation.Get(Language_Default+"."+item[start+2:end]) != nil {
+				item = strings.ReplaceAll(item, item[start:end+2], Translation.Get(Language_Default+"."+item[start+2:end]).(string))
+				lines[index] = item
+			} else {
+				Log.Error("There is no translation for: " + item[start+2:end])
+			}
+			Log.Info(item)
+
+		}
+	}
+	var result string
+
+	// Соединяем строки из среза
+	for _, line := range lines {
+		result += line + "\n" // Добавляем строку и перевод строки
+	}
+	return result, nil
+}
+
 func Server() {
 	// Обработка статических файлов
-	fs := http.FileServer(http.Dir(Path.StaticDir))
+	fs_0 := http.FileServer(http.Dir(Path.HomePath + "\\" + Path.Themes + "\\" + string(App_Settings.GetStringBytes("theme"))))
+	fs_1 := http.FileServer(http.Dir(Path.HomePath + "\\" + Path.PlayLists))
 	//
 	//
-	http.Handle("/", http.StripPrefix("/", fs))
+	http.Handle("/", fs_0)
+	http.Handle("/PlayLists/", http.StripPrefix("/PlayLists/", fs_1))
 	//
 	//
-	http.HandleFunc("/player.window", func(w http.ResponseWriter, r *http.Request) {
-		// Чтение HTML файла
-		html, err := os.ReadFile(fmt.Sprintf("%s/html/index.html", Path.StaticDir))
-		if err != nil {
-			http.Error(w, "Не удалось загрузить HTML файл", http.StatusInternalServerError)
-			return
-		}
+	go func() {
+		// Обработка "/player.window" и возврат конкретного HTML-файла
+		http.HandleFunc("/player.window", func(w http.ResponseWriter, r *http.Request) {
+			// Путь к HTML-файлу
+			theme := string(App_Settings.GetStringBytes("theme"))
+			htmlFilePath := Path.Themes + "/" + theme + "/html/index.html"
+			result, err := substitute(htmlFilePath)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				Log.Error(err)
+			} else {
+				// Установка заголовков ответа
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				w.Write([]byte(result))
+			}
 
-		// Установка Content-Type заголовка
-		w.Header().Set("Content-Type", "text/html")
-
-		// Отправка HTML содержимого клиенту
-		w.Write(html)
-
-	})
+		})
+	}()
 	//
 	//
-	http.HandleFunc("/settings.window", func(w http.ResponseWriter, r *http.Request) {
-		// Чтение HTML файла
-		html, err := os.ReadFile(fmt.Sprintf("%s/html/settings.html", Path.StaticDir))
-		if err != nil {
-			http.Error(w, "Не удалось загрузить HTML файл", http.StatusInternalServerError)
-			return
-		}
+	go func() {
+		// Обработка "/settings.window" и возврат конкретного HTML-файла
+		http.HandleFunc("/settings.window", func(w http.ResponseWriter, r *http.Request) {
+			// Путь к HTML-файлу
+			theme := string(App_Settings.GetStringBytes("theme"))
+			htmlFilePath := Path.Themes + "/" + theme + "/html/settings.html"
+			result, err := substitute(htmlFilePath)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				Log.Error(err)
+			} else {
+				// Установка заголовков ответа
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				w.Write([]byte(result))
+			}
+		})
+	}()
 
-		// Установка Content-Type заголовка
-		w.Header().Set("Content-Type", "text/html")
-
-		// Отправка HTML содержимого клиенту
-		w.Write(html)
-
-	})
 	http.HandleFunc("/send", func(w http.ResponseWriter, r *http.Request) {
 		// Получение параметра "command" из URL
 		command := r.URL.Query().Get("command")
